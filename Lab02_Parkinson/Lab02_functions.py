@@ -33,7 +33,7 @@ def print_performance(E, y, y_hat, nome):
 
 
 def distance(x1, x2):
-  dist = np.sqrt(np.sum((x1-x2)**2))
+  dist = np.sqrt(np.sum((x1-x2)**2))  #euclidean distance
   return dist
 
 
@@ -44,15 +44,15 @@ def find_K_closest(k, x , Xtr , ytr):
   closest = []
   for i , x_tr in enumerate(Xtr):
     dist = distance(x,x_tr)
-    closest.append((dist,i))
+    closest.append((dist,i))  #list of (distance , row ) of all points from the point x
 
-  closest.sort(key= lambda n: n[0])
-  K_closest = closest[0:k]
-  indexes = [elm[1] for elm in K_closest]
-  A = Xtr[indexes , :]
-  y = ytr[indexes]
-  w_hat = np.linalg.inv(A.T @ A + delta*identity_matrix) @ A.T @ y
-  y_hat = x.T @ w_hat
+  closest.sort(key= lambda n: n[0])   #sorting of the list
+  K_closest = closest[0:k] #taking the K nearest
+  indexes = [elm[1] for elm in K_closest] #taking the indexes of the K nearest
+  A = Xtr[indexes , :] #generating the data matrix A with only the k nearest points
+  y = ytr[indexes] #generating the regressand list with only the k nearest points
+  w_hat = np.linalg.inv(A.T @ A + delta*identity_matrix) @ A.T @ y  #LLS with regularization
+  y_hat = x.T @ w_hat #evaluating y_hat of the point x
   return y_hat
 
 

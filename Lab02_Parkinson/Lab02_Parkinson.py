@@ -11,7 +11,7 @@ features = list(X.columns) #list of features in the dataset
 
 Np,Nc = X.shape #Np = number of rows/ptients Nc=number Nf of regressors + 1 (regressand total UPDRS is included)
 
-seed = 30
+seed = 343420
 # shuffle da data
 Xsh = X.sample(frac=1, replace=False , random_state=seed , axis=0 , ignore_index=True)
 # 75% of dataset for training (validation + true training)
@@ -20,15 +20,15 @@ Ntr_val = int(Np*0.25)
 Nte = Np - ( Ntr_val + Ntr_ttd )
 
 
-X_tr_ttd = Xsh[0:Ntr_ttd]
-#evaluate mean ans standard deviation for the training data only
+X_tr_ttd = Xsh[0:Ntr_ttd]  #true training data
+#evaluate mean ans standard deviation for the true training data only
 mm = X_tr_ttd.mean()
 ss = X_tr_ttd.std()
 #mean and standard deviation of total UPDRS
 my = mm['total_UPDRS']
 sy = ss['total_UPDRS']
 
-Xsh_norm = (Xsh-mm)/ss  #normalized training data
+Xsh_norm = (Xsh-mm)/ss  #normalized data
 ysh_norm = Xsh_norm['total_UPDRS'] #regressand only
 
 
@@ -50,7 +50,7 @@ y_tr_ttd_norm=ysh_norm[0:Ntr_ttd] # regressand for true training
 y_tr_val_norm = ysh_norm[Ntr_ttd: (Ntr_ttd + Ntr_val)] # regressand for validation data
 y_te_norm=ysh_norm[(Ntr_ttd + Ntr_val):] #regressand for test phase
 
-#%% de-normalize data to put UPDRS in a scale understanable by the doctor
+#de-normalize regressand to put UPDRS in a scale understanable by the doctor (useful later)
 y_tr_ttd=y_tr_ttd_norm*sy+my
 y_tr_val=y_tr_val_norm*sy+my
 y_te=y_te_norm*sy+my
@@ -59,22 +59,22 @@ y_te=y_te_norm*sy+my
 #Finding optimal K in Validation Data
 Kmax = 75
 Kmin = 3
-mse_vect = []
-k_vect = np.arange(Kmin,Kmax)
+mse_vect = []  #vector containing all MSE for range of K
+k_vect = np.arange(Kmin,Kmax)  #range of K to evaluate
 for k in k_vect:
-    err_vect = []
-    y_hat_vect = []
+    # err_vect = []
+    y_hat_vect = []  #vector containing all y_hat from the validation data
     for x in X_tr_val_norm:
-        y_hat = find_K_closest(k, x, X_tr_ttd_norm , y_tr_ttd_norm )
-        y_hat_vect.append(y_hat)
+        y_hat_norm = find_K_closest(k, x, X_tr_ttd_norm , y_tr_ttd_norm )
+        y_hat_vect.append(y_hat_norm)
 
-    E_val = y_tr_val_norm - y_hat_vect
+    E_val = y_tr_val_norm - y_hat_vect  #evaluate error of y_hat
     MSE = np.mean(np.array(E_val) ** 2)
     mse_vect.append(MSE)
 
-K_opt = np.argmin(mse_vect) + Kmin
+K_opt = np.argmin(mse_vect) + Kmin  #optimal K, remember you are not starting from 0 but from Kmin
 print('Optimal K:',K_opt)
-print('Optimal MSE:' , mse_vect[(K_opt - Kmin)])
+# print('Optimal MSE:' , mse_vect[(K_opt - Kmin)]) #MSE associated with the optimal K
 
 #plot MSE over K for validation data
 plt.figure(figsize=(12, 6))
