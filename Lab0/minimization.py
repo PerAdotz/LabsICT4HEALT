@@ -110,19 +110,19 @@ class SolveGrad(SolveMinProbl):
         subclass to solve minimization problem with Gradient Algorithm
     """
     def run(self, gamma = 1e-3 , Nit = 100): #hyperparameters gamma and nummber of iterations
-        self.err = np.empty((0,2) , dtype= float) # empty array with two columns
-        self.gamma = gamma #learning rate
-        self.Nit = Nit #number of iterations
-        X = self.matr #retrive X
-        y = self.y #retrive y
-        w = np.random.randn(self.Nf, 1) #random start point
+        self.err = np.empty((0,2) , dtype= float) # empty array with two columns , vector of errors for plot
+        self.gamma = gamma # learning rate
+        self.Nit = Nit # number of iterations
+        X = self.matr # retrive X
+        y = self.y # retrive y
+        w = np.random.randn(self.Nf, 1) # random start point
         for i in range(Nit):
-            grad = 2*X.T@(X@w-y) #gradient of current value
+            grad = 2*X.T@(X@w-y) # gradient of current value
             w = w - gamma*grad # update of w
-            sqerr = np.linalg.norm(X@w - y)**2 #square norm of the error
+            sqerr = np.linalg.norm(X@w - y)**2 # square norm of the error
             self.err = np.append(self.err , np.array([[i,sqerr]]), axis= 0)
         self.what = w # store w in what
-        self.min = sqerr #store sqerr in self.min
+        self.min = sqerr # store sqerr in self.min
         return
 
     def plot_err(self, title = 'Square error'):
@@ -146,20 +146,20 @@ class SolveSteepDesc(SolveMinProbl):
         self.err = np.empty((0, 2), dtype=float)
         X = self.matr
         y = self.y.reshape(-1, 1)
-        w = np.random.randn(self.Nf,1)
-        HessMatr =  2*(X.T@X)
-        grad = 2 * X.T @ (X @ w - y)
+        w = np.random.randn(self.Nf,1)  # random firt start point
+        HessMatr =  2*(X.T@X)  # solving a quadratic problem so Hessian Matrix can be avaluated 1 time at the beginning
+        grad = 2 * X.T @ (X @ w - y)  # grandient of the first point
         i = 0
-        sqerr = np.linalg.norm(X @ w - y) ** 2
-        while i < Nit and grad.T @ HessMatr @ grad > 1e-10:
-            self.err = np.append(self.err, np.array([[i, sqerr]]), axis=0)
-            optGamma = (np.linalg.norm(grad) ** 2) / (grad.T @ HessMatr @ grad)
-            w = w - optGamma * grad
-            sqerr = np.linalg.norm(X @ w - y) ** 2  # square norm of the error
-            grad = 2 * X.T @ (X @ w - y)
+        sqerr = np.linalg.norm(X @ w - y) ** 2 # square error of the first point
+        while i < Nit and grad.T @ HessMatr @ grad > 1e-12:   # 1e-12 just to avoid division by 0
+            self.err = np.append(self.err, np.array([[i, sqerr]]), axis=0)  # append the square error to the vector of errors for the plot
+            optGamma = (np.linalg.norm(grad) ** 2) / (grad.T @ HessMatr @ grad)  # evaluation of the optimum gamma
+            w = w - optGamma * grad # evaluating next point
+            sqerr = np.linalg.norm(X @ w - y) ** 2  # square norm of the error of the next point
+            grad = 2 * X.T @ (X @ w - y) # gradient of the next point
             i += 1
         # self.what = w
-        self.what = [item[0] for item in w] #solo per formattarli meglio
+        self.what = [item[0] for item in w] # better format for the main
         self.min = sqerr
         return
 

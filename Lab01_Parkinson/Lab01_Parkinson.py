@@ -120,5 +120,5 @@ s.print_performance(E_tr_SD,E_te_SD,y_tr,y_te,y_hat_tr_SD,y_hat_te_SD, "Steepest
 plot_regression_line(y_te , y_hat_te_SD , "SD-test")
 
 
-plt.show()
+# plt.show()
 

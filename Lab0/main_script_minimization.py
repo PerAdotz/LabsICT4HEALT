@@ -23,7 +23,7 @@ g.print_result('Gradient Algorithm')
 g.plot_what('Gradient Algorithm')
 g.plot_err('Gradient Algorithm')
 
-NitSteep = 1000
+NitSteep = 150
 s = mymin.SolveSteepDesc(y,X)
 s.run(NitSteep)
 s.print_result('Steepest Descent')
